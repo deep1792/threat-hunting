@@ -1,0 +1,17 @@
+CVE-2017-0199 Agent Tesla
+
+Malicious Execution chain - 
+- phishing email --> malicious.xla --> seemebestthingsevermeetgivenbestthingsfornewways.hta --> comonstraints.vbs --> givvuo2katk3jnggipgn.jpg (contain embedded information) --> DBatLoader/GuiLoader --> data exfiltration via FTP
+
+Malicious.xla file
+- File name: Nuevo orden.xla
+- SHA256 hash: 2b14225a0e97081a7142e16423136b06c17cea24ed34b9e696864823468d7dfc
+
+IOCs
+- https://s.deemos.com
+- http://192.3.27.144/xampp/mpa/seemebestthingsevermeetgivenbestthingsfornewways.hta
+- http://107.172.31.5/comonstraints.vbs
+- https://res.cloudinary.com/dnkr4s5yg/image/upload/v1735420882/givvuo2katk3jnggipgn.jpg
+- http://107.172.31.5/foeMMBIG.txt
+- http://ip-api.com/line/?fields=hosting
+- 89.39.83.184 - ftp.horeca-bucuresti.ro - FTP used for data exfiltration
