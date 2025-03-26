@@ -1,7 +1,7 @@
-# medusa-ransomware-analysis
+# medusa-ransomware-analysis -- complete digital forensics and incident response (DFIR)
 Complete In depth technical ransomware analysis -- 
 
-Youtube link -- https://youtu.be/KqRsRPhipVk
+Youtube link demonstrating in-depth practical analysis for the medusa ransomware -- https://youtu.be/KqRsRPhipVk
 ----------------------------------
 MITRE -- TTPs 
 TA0043 - Reconnaissance
