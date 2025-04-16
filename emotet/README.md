@@ -1,7 +1,9 @@
 # Emotet - The Malware Kingpin Exposed | Complete DFIR and malware analysis
 
 **Linkedin** - https://www.linkedin.com/in/deepanshukhanna/
+
 **Youtube Video link for complete analysis** - https://www.youtube.com/watch?v=pZceKO0QJQY
+
 **Practical Digital Forensics and Incident Response - Amazon book link** - https://www.amazon.in/Digital-Forensics-Incident-Response-investigations/dp/9365898714
 
 What is Emotet?
