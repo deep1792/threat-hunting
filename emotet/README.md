@@ -1,7 +1,9 @@
 # Emotet - The Malware Kingpin Exposed | Complete DFIR and malware analysis
 
-Linkedin - https://www.linkedin.com/in/deepanshukhanna/
-Youtube Video link for complete analysis - https://www.youtube.com/watch?v=pZceKO0QJQY
+**Linkedin** - https://www.linkedin.com/in/deepanshukhanna/
+**Youtube Video link for complete analysis** - https://www.youtube.com/watch?v=pZceKO0QJQY
+**Practical Digital Forensics and Incident Response - Amazon book link** - https://www.amazon.in/Digital-Forensics-Incident-Response-investigations/dp/9365898714
+
 
 What is Emotet?
 Emotet is a sophisticated, modular banking Trojan that evolved into a botnet used to deliver other types of malware such as ransomware (e.g., Ryuk, Conti) and steal sensitive information. It is primarily known for its highly effective phishing campaigns and worm-like propagation.
@@ -9,21 +11,21 @@ Emotet is a sophisticated, modular banking Trojan that evolved into a botnet use
 Initially discovered in 2014, Emotet was designed to steal banking credentials, but it later developed into a malware-as-a-service (MaaS) platform used by multiple cybercrime groups.
 
   Why Emotet is famous
-1. Modular Architecture
+1. **Modular Architecture**
 Emotet consists of a main loader and multiple modules. The loader installs Emotet, maintains persistence, and downloads additional modules, including:
 - Credential stealer
 - Email harvester
 - Spam bot
 - Malware downloader (for TrickBot, QakBot, Ryuk, etc.)
 
-2. Polymorphic Code
+2. **Polymorphic Code**
 Emotet changes its payload structure frequently to avoid antivirus detection using polymorphism, where the malware dynamically alters its code during replication.
 
-3. Command and Control (C2) Infrastructure
+3. **Command and Control (C2) Infrastructure**
 The botnet uses encrypted C2 communication and hardcoded IP lists for redundancy. Its architecture is often peer-to-peer, enhancing its resilience against takedowns.
 
 -------------------------------------------------------------------------------------
-Email Lures
+**Email Lures**
 
 From: hr-payroll@company-internal.com
 To: employee@company.com
@@ -66,7 +68,7 @@ Attachment: Salary_Adjustment_FY2025.doc
                └─ Ransomware (e.g., Ryuk)
 
 ----------------------------------------------------------------
-MITRE ATT&CK Mapping for Emotet
+**MITRE ATT&CK Mapping for Emotet**
 Initial Access	Phishing: Spearphishing Attachment -	T1566.001
 Execution	User Execution: Malicious Document	- T1204.002
 Persistence	Registry Run Keys / Startup Folder -	T1547.001
@@ -80,7 +82,7 @@ Collection	Email Collection -	T1114
 Impact	Data Encrypted for Impact (via Ryuk) -	T1486
 
 ----------------------------------------------------------------
-Emotet: Indicators of Compromise (IOCs)
+**Emotet: Indicators of Compromise (IOCs)**
 Hashes (Sample Payloads)
 SHA256: 3c8b3b7db9fcb73a3b55e9e4bb5c9d5c68d42128c87e478f92e165ba2ecf4e2a
 SHA256: 21db61f8e72e2b237d84e78c8cbfb3834e38f229e7fcce44edb77293e4e18f3a
@@ -104,7 +106,7 @@ C:\ProgramData\<random>.exe
 
 ------------------------------------------------------------------
 
-SIEM detection ---
+**SIEM detection ---**
 
 title: Emotet Execution via Office Macros
 id: a1b2c3d4-5678-90ab-cdef-1234567890ef
@@ -136,7 +138,7 @@ tags:
   - malware.emotet
 
 ------------------------------------------------
-Yara rule 
+**Yara rule **
 
 rule Emotet_Loader_Detection
 {
@@ -160,7 +162,7 @@ rule Emotet_Loader_Detection
         3 of ($http1, $ua1, $c2str, $exe_indicator, $email_harvest)
 }
 ----------------------------------------------------------------
-Emotet analysis --
+**Emotet analysis --**
 
 sudo mraptor -m emotet.xls -- to detect the macros
 sudo msodde -a emotet.xls  -- to detect the DDE links
