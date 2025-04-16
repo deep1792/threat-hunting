@@ -1,4 +1,4 @@
-# emotet malware analysis complete end-to-end
+# Emotet - The Malware Kingpin Exposed | Complete DFIR and malware analysis
 
 What is Emotet?
 Emotet is a sophisticated, modular banking Trojan that evolved into a botnet used to deliver other types of malware such as ransomware (e.g., Ryuk, Conti) and steal sensitive information. It is primarily known for its highly effective phishing campaigns and worm-like propagation.
