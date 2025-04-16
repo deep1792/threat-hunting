@@ -4,7 +4,6 @@
 **Youtube Video link for complete analysis** - https://www.youtube.com/watch?v=pZceKO0QJQY
 **Practical Digital Forensics and Incident Response - Amazon book link** - https://www.amazon.in/Digital-Forensics-Incident-Response-investigations/dp/9365898714
 
-
 What is Emotet?
 Emotet is a sophisticated, modular banking Trojan that evolved into a botnet used to deliver other types of malware such as ransomware (e.g., Ryuk, Conti) and steal sensitive information. It is primarily known for its highly effective phishing campaigns and worm-like propagation.
 
