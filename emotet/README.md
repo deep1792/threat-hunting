@@ -38,11 +38,11 @@ We’ve completed the annual compensation review. Your salary adjustment details
 
 Please do not share this document externally.
 
-Regards,  
+**Regards,  
 Meera Chauhan  
 HR Manager – Compensation  
 Company Internal HR  
-Attachment: Salary_Adjustment_FY2025.doc
+Attachment: Salary_Adjustment_FY2025.doc**
 ---------------------------------------------------------------------------------------
 [Phishing Email]
      |
@@ -79,7 +79,7 @@ Credential Access Credentials from Web Browsers - T1555.003
 Discovery System Information Discovery - T1082	
 Lateral Movement SMB/Windows Admin Shares - T1021.002	
 Command & Control Encrypted Channel over HTTP/S - T1573.001	
-Collection	Email Collection -	T1114	
+Collection Email Collection - T1114	
 Impact	Data Encrypted for Impact (via Ryuk) -	T1486	
 
 ----------------------------------------------------------------
