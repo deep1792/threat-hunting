@@ -70,17 +70,17 @@ Attachment: Salary_Adjustment_FY2025.doc
 
 ----------------------------------------------------------------
 **MITRE ATT&CK Mapping for Emotet**
-Initial Access	Phishing: Spearphishing Attachment -	T1566.001
-Execution	User Execution: Malicious Document	- T1204.002
-Persistence	Registry Run Keys / Startup Folder -	T1547.001
-Privilege Escalation	Process Injection -	T1055
-Defense Evasion	Obfuscated Files or Information -	T1027
-Credential Access	Credentials from Web Browsers -	T1555.003
-Discovery	System Information Discovery -	T1082
-Lateral Movement	SMB/Windows Admin Shares -	T1021.002
-Command & Control	Encrypted Channel over HTTP/S -	T1573.001
-Collection	Email Collection -	T1114
-Impact	Data Encrypted for Impact (via Ryuk) -	T1486
+Initial Access	Phishing: Spearphishing Attachment - T1566.001	
+Execution User Execution: Malicious Document - T1204.002	
+Persistence Registry Run Keys / Startup Folder - T1547.001	
+Privilege Escalation	Process Injection - T1055	
+Defense Evasion	Obfuscated Files or Information - T1027	
+Credential Access Credentials from Web Browsers - T1555.003	
+Discovery System Information Discovery - T1082	
+Lateral Movement SMB/Windows Admin Shares - T1021.002	
+Command & Control Encrypted Channel over HTTP/S - T1573.001	
+Collection	Email Collection -	T1114	
+Impact	Data Encrypted for Impact (via Ryuk) -	T1486	
 
 ----------------------------------------------------------------
 **Emotet: Indicators of Compromise (IOCs)**
