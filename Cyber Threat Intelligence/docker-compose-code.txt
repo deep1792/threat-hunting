@@ -1,9 +1,9 @@
   connector-mitre:
     image: opencti/connector-mitre:6.6.14
     environment:
-      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_URL=http://<machine-IP>:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=617cf5c2-f86c-4ad7-a93b-4118f4fb496c
+      - CONNECTOR_ID=<random-generate-UUID>
       - "CONNECTOR_NAME=MITRE Datasets"
       - CONNECTOR_SCOPE=tool,report,malware,identity,campaign,intrusion-set,attack-pattern,course-of-action,x-mitre-data-source,x-mitre-data-component,x-mitre-matrix,x-mitre-tactic,x-mitre-collection
       - CONNECTOR_RUN_AND_TERMINATE=false
@@ -20,9 +20,9 @@
  #     - CONNECTOR_NAME=Ransomware Connector
  #     - CONNECTOR_SCOPE=identity,attack-pattern,course-of-action,intrusion-set,malware,tool,report
       # Connector's generic execution parameters:
- #     - OPENCTI_URL=http://192.168.65.130:8080
+ #     - OPENCTI_URL=http://<machine-IP>:8080
   #    - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN} #generate user token
-   #   - CONNECTOR_ID=10c6f292-8bca-47c9-9c34-19354fce0e74 #Valid UUIDv4 tokem
+   #   - CONNECTOR_ID=<random-generate-UUID> #Valid UUIDv4 tokem
     # - CONNECTOR_PULL_HISTORY=false # If true, the connector will pull the history of the data. But it is not recommended to set it to true as there will a large influx of data.
     #  - CONNECTOR_HISTORY_START_YEAR=2023 # Data only goes back till 2020
     #  - CONNECTOR_RUN_EVERY=10m # 10 minutes will be the ideal time
@@ -32,9 +32,9 @@
   connector-malwarebazaar-recent-additions:
     image: opencti/connector-malwarebazaar-recent-additions:6.6.14
     environment:
-      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_URL=http://<machine-IP>:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=cb89108b-8288-44a1-bc88-08a8a1e3bdb3
+      - CONNECTOR_ID=<random-generate-UUID>
       - "CONNECTOR_NAME=MalwareBazaar Recent Additions"
       - CONNECTOR_LOG_LEVEL=error
       - MALWAREBAZAAR_RECENT_ADDITIONS_API_URL=https://mb-api.abuse.ch/api/v1/
@@ -48,9 +48,9 @@
   connector-malpedia:
     image: opencti/connector-malpedia:6.6.14
     environment:
-      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_URL=http://<machine-IP>0:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=8a4e9c37-6ab4-41ac-a103-4fae34ecb1a7
+      - CONNECTOR_ID=<random-generate-UUID>
       - CONNECTOR_NAME=Malpedia
       - CONNECTOR_SCOPE=malpedia
       - CONNECTOR_LOG_LEVEL=error
@@ -66,15 +66,15 @@
   connector-alienvault:
     image: opencti/connector-alienvault:6.6.14
     environment:
-      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_URL=http://<machine-IP>0:8080
       - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
-      - CONNECTOR_ID=e24f396a-79c6-4ec7-a185-c718efdb13dc
+      - CONNECTOR_ID=<random-generate-UUID>
       - CONNECTOR_NAME=AlienVault
       - CONNECTOR_SCOPE=alienvault
       - CONNECTOR_LOG_LEVEL=error
       - CONNECTOR_DURATION_PERIOD=PT30M # In ISO8601 Format starting with "P" for Period ex: "PT30M" = Period time of 30 minutes
       - ALIENVAULT_BASE_URL=https://otx.alienvault.com
-      - ALIENVAULT_API_KEY=d6b3e04f4691f4416e8b4cb80044770fb1005e3686c3511bb06b6567a7f98e7f
+      - ALIENVAULT_API_KEY=API-Key
       - ALIENVAULT_TLP=White
       - ALIENVAULT_CREATE_OBSERVABLES=true
       - ALIENVAULT_CREATE_INDICATORS=true
@@ -117,6 +117,8 @@
 	
 	---------------------------------
 	
+RSS Feeds	
+
 http://feeds.trendmicro.com/TrendMicroSimplySecurity 
 http://www.theregister.co.uk/security/headlines.atom 
 https://thedfirreport.com/feed/ SecurityWeek
@@ -140,19 +142,15 @@ http://www.bleepingcomputer.com/feed/
 http://feeds.trendmicro.com/Anti-MalwareBlog/
 http://thehackernews.com/feeds/posts/default	
 http://packetstormsecurity.org/headlines.xml
-	
-	
-	
-	
-	
 	---------------
 	
+.Env Variables
 	
 OPENCTI_ADMIN_EMAIL=admin@opencti.io
 OPENCTI_ADMIN_PASSWORD=Admin@1234!
-OPENCTI_ADMIN_TOKEN=d236a3f9-bda3-4214-a8d7-e835c206374c
-OPENCTI_BASE_URL=http://192.168.65.130:8080
-OPENCTI_HEALTHCHECK_ACCESS_KEY=f7aa9224-4169-4d47-954d-65e4fa070961
+OPENCTI_ADMIN_TOKEN=<random-generate-UUID>
+OPENCTI_BASE_URL=http://<machine-IP>:8080
+OPENCTI_HEALTHCHECK_ACCESS_KEY=<random-generate-UUID>
 MINIO_ROOT_USER=opencti
 MINIO_ROOT_PASSWORD=Admin@1234!
 RABBITMQ_DEFAULT_USER=opencti
