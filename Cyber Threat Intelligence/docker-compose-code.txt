@@ -1,0 +1,167 @@
+  connector-mitre:
+    image: opencti/connector-mitre:6.6.14
+    environment:
+      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=617cf5c2-f86c-4ad7-a93b-4118f4fb496c
+      - "CONNECTOR_NAME=MITRE Datasets"
+      - CONNECTOR_SCOPE=tool,report,malware,identity,campaign,intrusion-set,attack-pattern,course-of-action,x-mitre-data-source,x-mitre-data-component,x-mitre-matrix,x-mitre-tactic,x-mitre-collection
+      - CONNECTOR_RUN_AND_TERMINATE=false
+      - CONNECTOR_LOG_LEVEL=error
+      - MITRE_REMOVE_STATEMENT_MARKING=true
+      - MITRE_INTERVAL=4 # In days
+    restart: always
+  
+#  connector-ransomware:
+#    image: opencti/connector-ransomwarelive:6.6.14
+#   container_name: ransomware-connector
+#    environment:
+      # Connector's definition parameters:
+ #     - CONNECTOR_NAME=Ransomware Connector
+ #     - CONNECTOR_SCOPE=identity,attack-pattern,course-of-action,intrusion-set,malware,tool,report
+      # Connector's generic execution parameters:
+ #     - OPENCTI_URL=http://192.168.65.130:8080
+  #    - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN} #generate user token
+   #   - CONNECTOR_ID=10c6f292-8bca-47c9-9c34-19354fce0e74 #Valid UUIDv4 tokem
+    # - CONNECTOR_PULL_HISTORY=false # If true, the connector will pull the history of the data. But it is not recommended to set it to true as there will a large influx of data.
+    #  - CONNECTOR_HISTORY_START_YEAR=2023 # Data only goes back till 2020
+    #  - CONNECTOR_RUN_EVERY=10m # 10 minutes will be the ideal time
+      # Connector's custom execution parameters:
+   # restart: always 
+  
+  connector-malwarebazaar-recent-additions:
+    image: opencti/connector-malwarebazaar-recent-additions:6.6.14
+    environment:
+      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=cb89108b-8288-44a1-bc88-08a8a1e3bdb3
+      - "CONNECTOR_NAME=MalwareBazaar Recent Additions"
+      - CONNECTOR_LOG_LEVEL=error
+      - MALWAREBAZAAR_RECENT_ADDITIONS_API_URL=https://mb-api.abuse.ch/api/v1/
+      - MALWAREBAZAAR_RECENT_ADDITIONS_COOLDOWN_SECONDS=300 # Time to wait in seconds between subsequent requests
+      - MALWAREBAZAAR_RECENT_ADDITIONS_INCLUDE_TAGS=exe,dll,docm,docx,doc,xls,xlsx,xlsm,js # (Optional) Only download files if any tag matches. (Comma separated)
+      - MALWAREBAZAAR_RECENT_ADDITIONS_INCLUDE_REPORTERS= # (Optional) Only download files uploaded by these reporters. (Comma separated)
+      - MALWAREBAZAAR_RECENT_ADDITIONS_LABELS=malware-bazaar # (Optional) Labels to apply to uploaded Artifacts. (Comma separated)
+      - MALWAREBAZAAR_RECENT_ADDITIONS_LABELS_COLOR=#54483b # Color to use for labels
+    restart: always
+
+  connector-malpedia:
+    image: opencti/connector-malpedia:6.6.14
+    environment:
+      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=8a4e9c37-6ab4-41ac-a103-4fae34ecb1a7
+      - CONNECTOR_NAME=Malpedia
+      - CONNECTOR_SCOPE=malpedia
+      - CONNECTOR_LOG_LEVEL=error
+      - CONNECTOR_EXPOSE_METRICS=false
+      - "MALPEDIA_AUTH_KEY= # Empty key only fetches TLP:WHITE information"
+      - MALPEDIA_INTERVAL_SEC=60 # Run once every day
+      - MALPEDIA_IMPORT_INTRUSION_SETS=true
+      - MALPEDIA_IMPORT_YARA=true
+      - MALPEDIA_CREATE_INDICATORS=true
+      - MALPEDIA_CREATE_OBSERVABLES=true
+    restart: always
+
+  connector-alienvault:
+    image: opencti/connector-alienvault:6.6.14
+    environment:
+      - OPENCTI_URL=http://192.168.65.130:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=e24f396a-79c6-4ec7-a185-c718efdb13dc
+      - CONNECTOR_NAME=AlienVault
+      - CONNECTOR_SCOPE=alienvault
+      - CONNECTOR_LOG_LEVEL=error
+      - CONNECTOR_DURATION_PERIOD=PT30M # In ISO8601 Format starting with "P" for Period ex: "PT30M" = Period time of 30 minutes
+      - ALIENVAULT_BASE_URL=https://otx.alienvault.com
+      - ALIENVAULT_API_KEY=d6b3e04f4691f4416e8b4cb80044770fb1005e3686c3511bb06b6567a7f98e7f
+      - ALIENVAULT_TLP=White
+      - ALIENVAULT_CREATE_OBSERVABLES=true
+      - ALIENVAULT_CREATE_INDICATORS=true
+      - ALIENVAULT_PULSE_START_TIMESTAMP=2022-05-01T00:00:00                  # BEWARE! Could be a lot of pulses!
+      - ALIENVAULT_REPORT_TYPE=threat-report
+      - ALIENVAULT_REPORT_STATUS=New
+      - ALIENVAULT_GUESS_MALWARE=false                                        # Use tags to guess malware.
+      - ALIENVAULT_GUESS_CVE=false                                            # Use tags to guess CVE.
+      - ALIENVAULT_EXCLUDED_PULSE_INDICATOR_TYPES=FileHash-MD5,FileHash-SHA1  # Excluded Pulse indicator types.
+      - ALIENVAULT_ENABLE_RELATIONSHIPS=true                                  # Enable/Disable relationship creation between SDOs.
+      - ALIENVAULT_ENABLE_ATTACK_PATTERNS_INDICATES=false                     # Enable/Disable "indicates" relationships between indicators and attack patterns
+      - ALIENVAULT_INTERVAL_SEC=1800
+      - ALIENVAULT_DEFAULT_X_OPENCTI_SCORE=50
+      - ALIENVAULT_X_OPENCTI_SCORE_IP=60
+      - ALIENVAULT_X_OPENCTI_SCORE_DOMAIN=70
+      - ALIENVAULT_X_OPENCTI_SCORE_HOSTNAME=75
+      - ALIENVAULT_X_OPENCTI_SCORE_EMAIL=70
+      - ALIENVAULT_X_OPENCTI_SCORE_FILE=85
+      - ALIENVAULT_X_OPENCTI_SCORE_URL=80
+      - ALIENVAULT_X_OPENCTI_SCORE_MUTEX=60
+      - ALIENVAULT_X_OPENCTI_SCORE_CRYPTOCURRENCY_WALLET=80
+    restart: always
+
+  connector-abuseipdb-ipblacklist:
+    image: opencti/connector-abuseipdb-ipblacklist:6.6.14
+    environment:
+      - OPENCTI_URL=http://opencti:8080
+      - OPENCTI_TOKEN=${OPENCTI_ADMIN_TOKEN}
+      - CONNECTOR_ID=e9be5e3b-c1d5-4a88-8500-6c75d0ac84db # Valid UUIDv4
+      - "CONNECTOR_NAME=AbuseIPDB IP Blacklist"
+      - CONNECTOR_SCOPE=abuseipdb
+      - CONNECTOR_LOG_LEVEL=error
+      - ABUSEIPDB_URL=https://api.abuseipdb.com/api/v2/blacklist
+      - ABUSEIPDB_API_KEY=ecf2418349b4ebd1e21eeeab7bd55231b8209fe11953fcbff9539a5884feee06c6cb3e4a71c361e4
+      - ABUSEIPDB_SCORE=100
+      - ABUSEIPDB_LIMIT=10000000
+      - ABUSEIPDB_INTERVAL=1 #Day
+    restart: always
+	
+	
+	---------------------------------
+	
+http://feeds.trendmicro.com/TrendMicroSimplySecurity 
+http://www.theregister.co.uk/security/headlines.atom 
+https://thedfirreport.com/feed/ SecurityWeek
+http://feeds.feedburner.com/Securityweek
+http://securityaffairs.co/wordpress/feed
+https://securelist.com/feed/
+https://blogs.sans.org/computer-forensics/feed/
+http://researchcenter.paloaltonetworks.com/feed/ 
+http://blogs.technet.com/msrc/rss.xml
+http://blogs.technet.com/mmpc/rss.xml
+http://blog.malwarebytes.org/feed/
+http://blog.zeltser.com/rss
+http://krebsonsecurity.com/feed/
+http://www.hexacorn.com/blog/feed/
+http://feeds.feedburner.com/hackread
+http://feeds.feedburner.com/darknethackers
+http://www.darkreading.com/rss/all.xml
+http://vrt-sourcefire.blogspot.com/feeds/posts/default
+https://www.us-cert.gov/ncas/alerts.xml
+http://www.bleepingcomputer.com/feed/
+http://feeds.trendmicro.com/Anti-MalwareBlog/
+http://thehackernews.com/feeds/posts/default	
+http://packetstormsecurity.org/headlines.xml
+	
+	
+	
+	
+	
+	---------------
+	
+	
+OPENCTI_ADMIN_EMAIL=admin@opencti.io
+OPENCTI_ADMIN_PASSWORD=Admin@1234!
+OPENCTI_ADMIN_TOKEN=d236a3f9-bda3-4214-a8d7-e835c206374c
+OPENCTI_BASE_URL=http://192.168.65.130:8080
+OPENCTI_HEALTHCHECK_ACCESS_KEY=f7aa9224-4169-4d47-954d-65e4fa070961
+MINIO_ROOT_USER=opencti
+MINIO_ROOT_PASSWORD=Admin@1234!
+RABBITMQ_DEFAULT_USER=opencti
+RABBITMQ_DEFAULT_PASS=Admin@1234!
+CONNECTOR_EXPORT_FILE_STIX_ID=dd817c8b-abae-460a-9ebc-97b1551e70e6
+CONNECTOR_EXPORT_FILE_CSV_ID=7ba187fb-fde8-4063-92b5-c3da34060dd7
+CONNECTOR_EXPORT_FILE_TXT_ID=ca715d9c-bd64-4351-91db-33a8d728a58b
+CONNECTOR_IMPORT_FILE_STIX_ID=72327164-0b35-482b-b5d6-a5a3f76b845f
+CONNECTOR_IMPORT_DOCUMENT_ID=c3970f8a-ce4b-4497-a381-20b7256f56f0
+CONNECTOR_ANALYSIS_ID=4dffd77c-ec11-4abe-bca7-fd997f79fa36
+SMTP_HOSTNAME=localhost
+ELASTIC_MEMORY_SIZE=4G
