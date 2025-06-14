@@ -1,5 +1,7 @@
 Kubernetes Forensics Complete Threat Hunting Pratical Lab for threat-hunters
 
+Youtube Link - https://youtu.be/Dfkffh27bGk 
+
 in this video we will look for the -- 
 	1. Basics of Kubernetes (focus only from - threat hunting/forensics perspective)
 	2. setting up complete end-to-end attacker's compromised lab which will include:
