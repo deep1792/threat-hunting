@@ -148,9 +148,9 @@ MIT License. See `LICENSE.md`.
 
 ---
 
-## Support This Project via UPI 🇮🇳
+## Support This Project
 
-If you find **Kubepwn** useful and want to support its development, you can send a payment via UPI:
+If you find **Kubepwn** useful and want to support its development, you can buy me a coffee:
 
 **UPI ID:** "alivejatt@oksbi"
 
