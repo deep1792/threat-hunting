@@ -33,19 +33,19 @@ Docker is an open-source platform that automates application deployment, scaling
 
 ## 🧱 Docker Architecture
 
-+-------------------------+
-| Docker Client |
-+-----------+-------------+
-|
-+-----------v-------------+
-| Docker Daemon |
-+-----------+-------------+
-|
-+-----------v-------------+
-| Docker Objects (Images, |
-| Containers, Volumes, |
-| Networks) |
-+-------------------------+
+    +-------------------------+
+    | Docker Client |
+    +-----------+-------------+
+    |
+    +-----------v-------------+
+    | Docker Daemon |
+    +-----------+-------------+
+    |
+    +-----------v-------------+
+    | Docker Objects (Images, |
+    | Containers, Volumes, |
+    | Networks) |
+    +-------------------------+
 
 ---
 
