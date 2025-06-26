@@ -1,1 +1,0 @@
-# darkgate malware analysis
