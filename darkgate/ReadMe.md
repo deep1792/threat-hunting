@@ -1,3 +1,5 @@
+darkgate malware analysis
+
 now this is very insteresting malware, so after spending some time, below analysis i prepared for simplicity
 
  Step-by-Step Analysis of DarkGate Malware (independert.msi)
